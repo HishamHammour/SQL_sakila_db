@@ -68,9 +68,9 @@ AND actor.last_name = 'WILLIAMS';
 -- 4d. Correcting the first back to GROUCHO 
 UPDATE actor 
 SET first_name =
-					CASE
-						WHEN first_name= 'HARPO' THEN 'GROUCHO'
-					END
+	CASE
+	WHEN first_name= 'HARPO' THEN 'GROUCHO'
+	END
 WHERE actor_id = 172;
 
 -- 5a. You cannot locate the schema of the address table.
@@ -96,26 +96,19 @@ GROUP BY staff.last_name , staff.first_name;
 
 -- 6c. List each film and the number of actors who are listed for that film.
 -- Use tables film_actor and film. Use inner join.
-SELECT 
-    film.title, COUNT(film_actor.actor_id) AS num_of_actors
-FROM
-    film_actor
-        INNER JOIN
-    film ON film_actor.film_id = film.film_id
+SELECT film.title, COUNT(film_actor.actor_id) AS num_of_actors
+FROM film_actor
+INNER JOIN film
+ON film_actor.film_id = film.film_id
 GROUP BY film.title;
 
 -- 6d. How many copies of the film Hunchback Impossible exist in the inventory system?
-SELECT 
-    COUNT(inventory.film_id)
-FROM
-    inventory
-WHERE
-    inventory.film_id = (SELECT 
-            film_id
-        FROM
-            film
-        WHERE
-            film.title = 'Hunchback Impossible');
+SELECT COUNT(inventory.film_id)
+FROM inventory
+WHERE inventory.film_id =
+    (SELECT film_id
+    FROM film
+    WHERE film.title = 'Hunchback Impossible');
 
 -- 6e. Using the tables payment and customer and the JOIN command, list the total paid
 -- by each customer. List the customers alphabetically by last name:
@@ -123,7 +116,8 @@ SELECT
     customer.first_name,
     customer.last_name,
     SUM(payment.amount) AS Total
-FROM payment LEFT JOIN customer 
+FROM payment
+LEFT JOIN customer 
 ON customer.customer_id = payment.customer_id
 GROUP BY customer.first_name , customer.last_name
 ORDER BY customer.last_name ASC;
@@ -136,35 +130,35 @@ ORDER BY customer.last_name ASC;
 SELECT film.title
 FROM film
 WHERE film.language_id =
-        (SELECT language_id
-        FROM language
-        WHERE language.name = 'English')
-    AND film.title LIKE 'K%'
-    OR film.title LIKE 'Q%';
+    (SELECT language_id
+    FROM language
+    WHERE language.name = 'English')
+AND film.title LIKE 'K%'
+OR film.title LIKE 'Q%';
 
 -- 7b. Use subqueries to display all actors who appear in the 
 -- film Alone Trip.
 SELECT actor.first_name, actor.last_name
 FROM actor
 WHERE actor.actor_id = 
-	ANY (SELECT actor_id
-			FROM film_actor
-			WHERE film_actor.film_id =
-				(SELECT film_id
-					FROM film
-					WHERE film.title = 'Alone Trip'));
+ANY (SELECT actor_id
+	FROM film_actor
+	WHERE film_actor.film_id =
+		(SELECT film_id
+		FROM film
+		WHERE film.title = 'Alone Trip'));
 
 -- 7c. You want to run an email marketing campaign in Canada,
 -- for which you will need the names and email addresses of all Canadian customers.
 -- Use joins to retrieve this information.
 SELECT customer.first_name, customer.last_name, customer.email
 FROM customer
-        INNER JOIN
-    address ON address.address_id = customer.address_id
-        INNER JOIN
-    city ON address.city_id = city.city_id
-        INNER JOIN
-    country ON city.country_id = country.country_id
+INNER JOIN address
+ON address.address_id = customer.address_id
+INNER JOIN city
+ON address.city_id = city.city_id
+INNER JOIN country
+ON city.country_id = country.country_id
 WHERE country.country = 'Canada';
 
 -- 7d. Sales have been lagging among young families,
@@ -173,13 +167,13 @@ WHERE country.country = 'Canada';
 SELECT title
 FROM film
 WHERE film.film_id =
-		ANY (SELECT film_id
-				FROM film_category
-				WHERE film_category.category_id =
-                (SELECT category_id
-					FROM category
-					WHERE
-                    name = 'Family'));
+ANY (SELECT film_id
+	FROM film_category
+	WHERE film_category.category_id =
+        (SELECT category_id
+		FROM category
+		WHERE
+        name = 'Family'));
 
 -- 7e. Display the most frequently rented movies in descending order.
 SELECT title, COUNT(rental.inventory_id) AS Times_Rented
